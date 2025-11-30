@@ -79,8 +79,7 @@ export default function SignUpScreen({ navigation }) {
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
-      // Accepted formats: JPEG, PNG, WebP, GIF, BMP, TIFF, HEIC (iPhone format)
-      // Note: HEIC images are automatically converted to JPEG by the system
+      // Accepted formats: JPEG, PNG, WebP, GIF, BMP, TIFF
     });
 
     if (!result.canceled) {
@@ -246,7 +245,7 @@ export default function SignUpScreen({ navigation }) {
               </Text>
             </TouchableOpacity>
             <Text style={styles.formatInfo}>
-              Formats: JPEG, PNG, WebP, GIF, BMP, TIFF, HEIC
+              Formats: JPEG, PNG, WebP, GIF, BMP, TIFF
             </Text>
             <Text style={styles.requiredText}>
               * Required field

@@ -44,8 +44,7 @@ export default function ProfileScreen({ navigation }) {
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
-      // Accepted formats: JPEG, PNG, WebP, GIF, BMP, TIFF, HEIC (iPhone format)
-      // Note: HEIC images are automatically converted to JPEG by the system
+      // Accepted formats: JPEG, PNG, WebP, GIF, BMP, TIFF
     });
 
     if (!result.canceled) {
@@ -91,7 +90,7 @@ export default function ProfileScreen({ navigation }) {
             <Text style={styles.changePhotoText}>Change Photo</Text>
           </TouchableOpacity>
           <Text style={styles.formatInfo}>
-            Accepted formats: JPEG, PNG, WebP, GIF, BMP, TIFF, HEIC
+            Accepted formats: JPEG, PNG, WebP, GIF, BMP, TIFF
           </Text>
         </View>
 
