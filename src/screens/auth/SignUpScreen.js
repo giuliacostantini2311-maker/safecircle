@@ -197,16 +197,12 @@ export default function SignUpScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
           {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity
@@ -463,7 +459,7 @@ export default function SignUpScreen({ navigation }) {
             </TouchableOpacity>
           </View>
         </ScrollView>
-      </KeyboardAvoidingView>
+      
 
       {/* Country Picker Modal */}
       <Modal
@@ -525,9 +521,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+    ...(Platform.OS === 'web' && { 
+      height: '100vh',
+      maxHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+    }),
   },
   keyboardView: {
     flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+    ...(Platform.OS === 'web' && { 
+      overflowY: 'scroll',
+      overflowX: 'hidden',
+      WebkitOverflowScrolling: 'touch',
+    }),
   },
   scrollContent: {
     flexGrow: 1,
