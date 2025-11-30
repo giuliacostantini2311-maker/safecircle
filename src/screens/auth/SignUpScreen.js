@@ -49,6 +49,7 @@ export default function SignUpScreen({ navigation }) {
   const [avatar, setAvatar] = useState(null);
   const [fullName, setFullName] = useState('');
   const [age, setAge] = useState('');
+  const [gender, setGender] = useState(null); // 'female', 'male', or 'other'
   const [email, setEmail] = useState('');
   const [selectedCountry, setSelectedCountry] = useState(COUNTRY_CODES[0]);
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -101,6 +102,10 @@ export default function SignUpScreen({ navigation }) {
       errors.age = 'You must be at least 16 years old';
     } else if (ageNum > 120) {
       errors.age = 'Please enter a valid age';
+    }
+    
+    if (!gender) {
+      errors.gender = 'Please select your gender';
     }
     
     if (!email.trim()) {
@@ -163,13 +168,14 @@ export default function SignUpScreen({ navigation }) {
       username,
       phone: `${selectedCountry.code} ${phoneNumber}`,
       age: parseInt(age),
+      gender,
       avatar,
       verified: isVerified,
     });
     setLoading(false);
   };
 
-  const isFormValid = avatar && fullName && age && email && phoneNumber && 
+  const isFormValid = avatar && fullName && age && gender && email && phoneNumber && 
                       username && password && isVerified && agreedToTerms;
 
   const renderCountryItem = ({ item }) => (
@@ -196,6 +202,7 @@ export default function SignUpScreen({ navigation }) {
         style={styles.keyboardView}
       >
         <ScrollView
+          style={{ flex: 1 }}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
@@ -269,6 +276,69 @@ export default function SignUpScreen({ navigation }) {
               icon="calendar"
               error={validationErrors.age}
             />
+
+            {/* Gender Selection */}
+            <View style={styles.genderSection}>
+              <Text style={styles.inputLabel}>Gender *</Text>
+              <View style={styles.genderOptions}>
+                <TouchableOpacity
+                  style={[
+                    styles.genderOption,
+                    gender === 'female' && styles.genderOptionActive,
+                  ]}
+                  onPress={() => setGender('female')}
+                >
+                  <Feather 
+                    name="user" 
+                    size={20} 
+                    color={gender === 'female' ? colors.textLight : colors.primary} 
+                  />
+                  <Text style={[
+                    styles.genderOptionText,
+                    gender === 'female' && styles.genderOptionTextActive,
+                  ]}>Female</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity
+                  style={[
+                    styles.genderOption,
+                    gender === 'male' && styles.genderOptionActive,
+                  ]}
+                  onPress={() => setGender('male')}
+                >
+                  <Feather 
+                    name="user" 
+                    size={20} 
+                    color={gender === 'male' ? colors.textLight : colors.primary} 
+                  />
+                  <Text style={[
+                    styles.genderOptionText,
+                    gender === 'male' && styles.genderOptionTextActive,
+                  ]}>Male</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity
+                  style={[
+                    styles.genderOption,
+                    gender === 'other' && styles.genderOptionActive,
+                  ]}
+                  onPress={() => setGender('other')}
+                >
+                  <Feather 
+                    name="users" 
+                    size={20} 
+                    color={gender === 'other' ? colors.textLight : colors.primary} 
+                  />
+                  <Text style={[
+                    styles.genderOptionText,
+                    gender === 'other' && styles.genderOptionTextActive,
+                  ]}>Other</Text>
+                </TouchableOpacity>
+              </View>
+              {validationErrors.gender && (
+                <Text style={styles.errorText}>{validationErrors.gender}</Text>
+              )}
+            </View>
 
             <Input
               label="Email *"
@@ -547,6 +617,39 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginBottom: spacing.sm,
     letterSpacing: 0.2,
+  },
+  // Gender section styles
+  genderSection: {
+    marginBottom: spacing.md,
+  },
+  genderOptions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  genderOption: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    marginHorizontal: 4,
+    borderRadius: 12,
+    backgroundColor: colors.backgroundAlt,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+  },
+  genderOptionActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  genderOptionText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text,
+    marginLeft: 8,
+  },
+  genderOptionTextActive: {
+    color: colors.textLight,
   },
   phoneContainer: {
     marginBottom: spacing.md,

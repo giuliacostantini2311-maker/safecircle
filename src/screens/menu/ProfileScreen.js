@@ -73,6 +73,7 @@ export default function ProfileScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView
+        style={{ flex: 1 }}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
@@ -83,6 +84,8 @@ export default function ProfileScreen({ navigation }) {
             size={100}
             onPress={pickImage}
             showEditButton
+            showBadge
+            helpsCount={user?.helpsCount}
           />
           <TouchableOpacity onPress={pickImage}>
             <Text style={styles.changePhotoText}>Change Photo</Text>

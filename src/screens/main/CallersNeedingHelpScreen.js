@@ -5,12 +5,13 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import Button from '../../components/Button';
 import { colors, spacing, typography } from '../../styles/colors';
-import { mockCallersNeedingHelp } from '../../services/mockData';
+import { mockCallersNeedingHelp, getDisplayName } from '../../services/mockData';
 
 export default function CallersNeedingHelpScreen({ navigation }) {
   const [callers] = useState(mockCallersNeedingHelp);
@@ -20,6 +21,7 @@ export default function CallersNeedingHelpScreen({ navigation }) {
   };
 
   const renderCaller = ({ item }) => {
+    const displayName = getDisplayName(item.firstName, item.lastName);
     return (
       <View style={styles.callerCard}>
         <View style={styles.callerCardHeader}>
@@ -28,7 +30,7 @@ export default function CallersNeedingHelpScreen({ navigation }) {
           </View>
           <View style={styles.callerInfo}>
             <Text style={styles.callerName}>
-              {item.username} needs your help
+              {displayName} needs your help
             </Text>
             <View style={styles.callerDistance}>
               <Feather name="map-pin" size={12} color={colors.textSecondary} />
@@ -53,7 +55,6 @@ export default function CallersNeedingHelpScreen({ navigation }) {
           title="Help this Caller"
           onPress={() => handleHelpCaller(item)}
           variant="safe"
-          icon="heart"
           style={styles.helpButton}
         />
       </View>
@@ -98,6 +99,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+    ...(Platform.OS === 'web' && { height: '100%' }),
   },
   headerInfo: {
     alignItems: 'center',

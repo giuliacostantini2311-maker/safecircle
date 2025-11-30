@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Modal,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
@@ -65,13 +66,18 @@ export default function HomeScreen({ navigation }) {
             name={user?.username || user?.firstName || 'User'}
             source={user?.avatar}
             size={38}
+            showBadge
+            helpsCount={user?.helpsCount}
           />
         </TouchableOpacity>
       </View>
 
       <ScrollView
+        style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        scrollEnabled={true}
+        nestedScrollEnabled={true}
       >
         {/* Greeting */}
         <View style={styles.greeting}>
@@ -138,29 +144,29 @@ export default function HomeScreen({ navigation }) {
             </View>
           </TouchableOpacity>
         </View>
-
-        {/* Callers Needing Help - Compact Section */}
-        {callersNeedingHelp.length > 0 && (
-          <TouchableOpacity
-            style={styles.callersSection}
-            onPress={() => navigation.navigate('CallersNeedingHelp')}
-            activeOpacity={0.8}
-          >
-            <View style={styles.callersSectionLeft}>
-              <View style={styles.callersIconContainer}>
-                <Feather name="alert-circle" size={20} color={colors.white} />
-              </View>
-              <View style={styles.callersInfo}>
-                <Text style={styles.callersTitle}>
-                  {callersNeedingHelp.length} {callersNeedingHelp.length === 1 ? 'person needs' : 'people need'} help
-                </Text>
-                <Text style={styles.callersSubtitle}>Tap to help someone nearby</Text>
-              </View>
-            </View>
-            <Feather name="chevron-right" size={22} color={colors.emergency} />
-          </TouchableOpacity>
-        )}
       </ScrollView>
+
+      {/* Callers Needing Help - Bottom Section */}
+      {callersNeedingHelp.length > 0 && (
+        <TouchableOpacity
+          style={styles.callersSection}
+          onPress={() => navigation.navigate('CallersNeedingHelp')}
+          activeOpacity={0.8}
+        >
+          <View style={styles.callersSectionLeft}>
+            <View style={styles.callersIconContainer}>
+              <Feather name="alert-circle" size={20} color={colors.white} />
+            </View>
+            <View style={styles.callersInfo}>
+              <Text style={styles.callersTitle}>
+                {callersNeedingHelp.length} {callersNeedingHelp.length === 1 ? 'person needs' : 'people need'} help
+              </Text>
+              <Text style={styles.callersSubtitle}>Tap to help someone nearby</Text>
+            </View>
+          </View>
+          <Feather name="chevron-right" size={22} color={colors.emergency} />
+        </TouchableOpacity>
+      )}
 
       {/* Status Bar */}
       <View style={styles.statusBar}>
@@ -194,6 +200,8 @@ export default function HomeScreen({ navigation }) {
                 name={user?.username || user?.firstName || 'User'}
                 source={user?.avatar}
                 size={72}
+                showBadge
+                helpsCount={user?.helpsCount}
               />
               <Text style={styles.menuUserName}>
                 {user?.username || 'User'}
@@ -232,16 +240,12 @@ export default function HomeScreen({ navigation }) {
                 <Text style={styles.menuItemText}>How SafeCircle Works</Text>
               </TouchableOpacity>
 
-              <View style={styles.menuDivider} />
-
               <TouchableOpacity
                 style={styles.menuItem}
-                onPress={() => navigateFromMenu('GuardianAlert')}
+                onPress={() => navigateFromMenu('Badges')}
               >
-                <Feather name="bell" size={20} color={colors.guardian} style={styles.menuItemIcon} />
-                <Text style={[styles.menuItemText, { color: colors.guardian }]}>
-                  [Demo] Guardian Alert
-                </Text>
+                <Feather name="award" size={20} color={colors.text} style={styles.menuItemIcon} />
+                <Text style={styles.menuItemText}>Guardian Badges</Text>
               </TouchableOpacity>
 
               <View style={styles.menuDivider} />
@@ -265,6 +269,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+    ...(Platform.OS === 'web' && { 
+      height: '100vh',
+      maxHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+    }),
   },
   header: {
     flexDirection: 'row',
@@ -285,7 +295,16 @@ const styles = StyleSheet.create({
     color: colors.primary,
     letterSpacing: -0.5,
   },
+  scrollView: {
+    flex: 1,
+    ...(Platform.OS === 'web' && { 
+      overflowY: 'scroll',
+      overflowX: 'hidden',
+      WebkitOverflowScrolling: 'touch',
+    }),
+  },
   scrollContent: {
+    flexGrow: 1,
     paddingHorizontal: spacing.screenPadding,
     paddingBottom: spacing.lg,
   },
@@ -364,12 +383,14 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textSecondary,
   },
-  // Callers Section - Compact
+  // Callers Section - Bottom Fixed
   callersSection: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: `${colors.emergency}08`,
+    marginHorizontal: spacing.screenPadding,
+    marginBottom: spacing.sm,
     borderRadius: 14,
     padding: spacing.md,
     borderWidth: 1.5,

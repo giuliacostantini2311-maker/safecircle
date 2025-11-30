@@ -57,6 +57,7 @@ export default function LoginScreen({ navigation }) {
         style={styles.keyboardView}
       >
         <ScrollView
+          style={{ flex: 1 }}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
@@ -69,7 +70,7 @@ export default function LoginScreen({ navigation }) {
             >
               <Feather name="arrow-left" size={24} color={colors.text} />
             </TouchableOpacity>
-          </View>
+            </View>
 
           {/* Title Section */}
           <View style={styles.titleSection}>

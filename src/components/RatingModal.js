@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import Modal from './Modal';
 import Button from './Button';
 import Avatar from './Avatar';
 import { colors, spacing } from '../styles/colors';
+import { getDisplayName } from '../services/mockData';
 
 export default function RatingModal({
   visible,
@@ -14,15 +15,34 @@ export default function RatingModal({
 }) {
   const [rating, setRating] = useState(null);
   const [wantToConnect, setWantToConnect] = useState(false);
+  const [negativeReason, setNegativeReason] = useState('');
+
+  const guardianDisplayName = guardian 
+    ? getDisplayName(guardian.firstName, guardian.lastName) 
+    : guardian?.name || 'Guardian';
+
+  // Check if submit is allowed
+  const canSubmit = rating === 'up' || (rating === 'down' && negativeReason.trim().length > 0);
 
   const handleSubmit = () => {
     onSubmit({
       rating,
       addToNetwork: wantToConnect,
+      negativeReason: rating === 'down' ? negativeReason : null,
     });
+    // Reset state
     setRating(null);
     setWantToConnect(false);
+    setNegativeReason('');
     onClose();
+  };
+
+  const handleRatingChange = (newRating) => {
+    setRating(newRating);
+    // Clear reason if switching to positive
+    if (newRating === 'up') {
+      setNegativeReason('');
+    }
   };
 
   return (
@@ -37,8 +57,14 @@ export default function RatingModal({
         {guardian && (
           <>
             <View style={styles.guardianInfo}>
-              <Avatar name={guardian.name} source={guardian.avatar} size={72} />
-              <Text style={styles.guardianName}>{guardian.name}</Text>
+              <Avatar 
+                name={guardianDisplayName} 
+                source={guardian.avatar} 
+                size={72}
+                showBadge
+                helpsCount={guardian.helpsCount}
+              />
+              <Text style={styles.guardianName}>{guardianDisplayName}</Text>
               <Text style={styles.helpedText}>helped you feel safe</Text>
             </View>
 
@@ -50,7 +76,7 @@ export default function RatingModal({
                   styles.ratingButton,
                   rating === 'up' && styles.ratingButtonActiveUp,
                 ]}
-                onPress={() => setRating('up')}
+                onPress={() => handleRatingChange('up')}
                 activeOpacity={0.8}
               >
                 <Feather
@@ -73,7 +99,7 @@ export default function RatingModal({
                   styles.ratingButton,
                   rating === 'down' && styles.ratingButtonActiveDown,
                 ]}
-                onPress={() => setRating('down')}
+                onPress={() => handleRatingChange('down')}
                 activeOpacity={0.8}
               >
                 <Feather
@@ -91,6 +117,30 @@ export default function RatingModal({
                 </Text>
               </TouchableOpacity>
             </View>
+
+            {/* Reason input for negative rating */}
+            {rating === 'down' && (
+              <View style={styles.reasonSection}>
+                <Text style={styles.reasonLabel}>
+                  Please tell us why <Text style={styles.requiredAsterisk}>*</Text>
+                </Text>
+                <TextInput
+                  style={styles.reasonInput}
+                  placeholder="What went wrong? Your feedback helps improve the community..."
+                  placeholderTextColor={colors.textMuted}
+                  value={negativeReason}
+                  onChangeText={setNegativeReason}
+                  multiline
+                  numberOfLines={3}
+                  textAlignVertical="top"
+                />
+                {negativeReason.trim().length === 0 && (
+                  <Text style={styles.reasonRequired}>
+                    A reason is required to continue
+                  </Text>
+                )}
+              </View>
+            )}
 
             <View style={styles.connectSection}>
               <Text style={styles.connectQuestion}>Add to your network?</Text>
@@ -113,9 +163,14 @@ export default function RatingModal({
                     wantToConnect && styles.connectButtonTextActive,
                   ]}
                 >
-                  {wantToConnect ? 'Connected!' : 'Connect'}
+                  {wantToConnect ? 'Added to Trusted!' : 'Connect'}
                 </Text>
               </TouchableOpacity>
+              {wantToConnect && (
+                <Text style={styles.connectNote}>
+                  Will be added to your trusted contacts
+                </Text>
+              )}
             </View>
           </>
         )}
@@ -125,7 +180,13 @@ export default function RatingModal({
           onPress={handleSubmit}
           variant="primary"
           style={styles.submitButton}
+          disabled={!canSubmit}
         />
+        {!canSubmit && rating === 'down' && (
+          <Text style={styles.submitHint}>
+            Please provide a reason to continue
+          </Text>
+        )}
       </View>
     </Modal>
   );
@@ -204,6 +265,37 @@ const styles = StyleSheet.create({
   ratingLabelActive: {
     color: colors.textLight,
   },
+  // Reason section for negative feedback
+  reasonSection: {
+    width: '100%',
+    marginBottom: spacing.lg,
+  },
+  reasonLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: spacing.sm,
+  },
+  requiredAsterisk: {
+    color: colors.emergency,
+  },
+  reasonInput: {
+    width: '100%',
+    minHeight: 80,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    borderRadius: 12,
+    padding: spacing.md,
+    fontSize: 15,
+    color: colors.text,
+    backgroundColor: colors.backgroundAlt,
+  },
+  reasonRequired: {
+    fontSize: 12,
+    color: colors.emergency,
+    marginTop: spacing.xs,
+  },
+  // Connect section
   connectSection: {
     width: '100%',
     alignItems: 'center',
@@ -242,7 +334,17 @@ const styles = StyleSheet.create({
   connectButtonTextActive: {
     color: colors.textLight,
   },
+  connectNote: {
+    fontSize: 12,
+    color: colors.safe,
+    marginTop: spacing.sm,
+  },
   submitButton: {
     width: '100%',
+  },
+  submitHint: {
+    fontSize: 12,
+    color: colors.textMuted,
+    marginTop: spacing.sm,
   },
 });

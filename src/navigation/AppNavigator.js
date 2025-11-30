@@ -14,7 +14,6 @@ import HomeScreen from '../screens/main/HomeScreen';
 import SelfSafetyScreen from '../screens/main/SelfSafetyScreen';
 import GuardianModeScreen from '../screens/main/GuardianModeScreen';
 import PoliceModeScreen from '../screens/main/PoliceModeScreen';
-import GuardianAlertScreen from '../screens/main/GuardianAlertScreen';
 import HelperChatScreen from '../screens/main/HelperChatScreen';
 import CallersNeedingHelpScreen from '../screens/main/CallersNeedingHelpScreen';
 
@@ -22,6 +21,7 @@ import CallersNeedingHelpScreen from '../screens/main/CallersNeedingHelpScreen';
 import ProfileScreen from '../screens/menu/ProfileScreen';
 import NetworkScreen from '../screens/menu/NetworkScreen';
 import HowItWorksScreen from '../screens/menu/HowItWorksScreen';
+import BadgesScreen from '../screens/menu/BadgesScreen';
 
 const Stack = createStackNavigator();
 
@@ -78,7 +78,7 @@ const MainStack = () => (
       name="GuardianMode" 
       component={GuardianModeScreen}
       options={{ 
-        title: 'Guardian Mode',
+        title: 'Call the Guardian',
         headerStyle: {
           ...screenOptions.headerStyle,
           backgroundColor: colors.background,
@@ -90,17 +90,6 @@ const MainStack = () => (
       component={PoliceModeScreen}
       options={{ 
         title: 'Emergency',
-        headerStyle: {
-          ...screenOptions.headerStyle,
-          backgroundColor: colors.background,
-        },
-      }}
-    />
-    <Stack.Screen 
-      name="GuardianAlert" 
-      component={GuardianAlertScreen}
-      options={{ 
-        title: 'Someone Needs Help',
         headerStyle: {
           ...screenOptions.headerStyle,
           backgroundColor: colors.background,
@@ -143,6 +132,11 @@ const MainStack = () => (
       name="HowItWorks" 
       component={HowItWorksScreen}
       options={{ title: 'How SafeCircle Works' }}
+    />
+    <Stack.Screen 
+      name="Badges" 
+      component={BadgesScreen}
+      options={{ title: 'Guardian Badges' }}
     />
     <Stack.Screen 
       name="Permissions" 

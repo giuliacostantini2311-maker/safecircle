@@ -103,7 +103,13 @@ export const AuthProvider = ({ children }) => {
         const storedUser = await AsyncStorage.getItem(STORAGE_KEYS.USER_DATA);
         if (storedUser) {
           const user = JSON.parse(storedUser);
+          // Ensure helpsCount exists (for users created before this feature)
+          if (user.helpsCount === undefined) {
+            user.helpsCount = 0; // Default to no badge
+          }
           dispatch({ type: AUTH_ACTIONS.LOGIN_SUCCESS, payload: user });
+          // Re-save with helpsCount if it was missing
+          await AsyncStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
         } else {
           dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
         }
@@ -176,6 +182,7 @@ export const AuthProvider = ({ children }) => {
             verified: false,
             language: 'en',
             createdAt: new Date().toISOString(),
+            helpsCount: 0, // New users start with no badge (0 helps)
           };
           
           // Store the user
@@ -210,10 +217,12 @@ export const AuthProvider = ({ children }) => {
         email: userData.email || '',
         phone: userData.phone || '',
         age: userData.age || null,
+        gender: userData.gender || null,
         avatar: userData.avatar || null,
         verified: userData.verified || false,
         language: 'en',
         createdAt: new Date().toISOString(),
+        helpsCount: 0, // New users start with no badge (0 helps)
       };
       
       // Store the user for future logins

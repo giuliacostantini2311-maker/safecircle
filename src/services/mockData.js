@@ -11,57 +11,89 @@ export const mockUser = {
   verified: true,
   language: 'en',
   createdAt: '2024-01-01',
+  helpsCount: 28, // Silver badge for demo
+  gender: 'female',
+};
+
+// Helper function to generate display name (First name + Last initial)
+export const getDisplayName = (firstName, lastName) => {
+  if (!firstName) return 'User';
+  const lastInitial = lastName ? `${lastName.charAt(0)}.` : '';
+  return `${firstName} ${lastInitial}`.trim();
 };
 
 // Helper function to generate realistic avatar URLs using DiceBear
-const getAvatarUrl = (seed, style = 'avataaars') => {
-  return `https://api.dicebear.com/7.x/${style}/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
+// Using PNG format for React Native mobile compatibility
+// Using 'lorelei' style for female, 'lorelei-neutral' seeds for male to ensure gender match
+const getAvatarUrl = (seed, gender = 'female') => {
+  // Use different styles/seeds to match gender
+  if (gender === 'male') {
+    // Use 'adventurer-neutral' for more masculine looking avatars
+    return `https://api.dicebear.com/7.x/adventurer-neutral/png?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9&size=200`;
+  }
+  // Use 'lorelei' for feminine looking avatars
+  return `https://api.dicebear.com/7.x/lorelei/png?seed=${seed}&backgroundColor=ffd5dc,ffdfbf,d1d4f9&size=200`;
 };
 
 export const mockGuardians = [
   { 
     id: 'guardian_1', 
+    firstName: 'Emma',
+    lastName: 'Sørensen',
     username: 'emma_s',
-    avatar: getAvatarUrl('emma_s', 'avataaars'), 
+    gender: 'female',
+    avatar: getAvatarUrl('emma_female_1', 'female'), 
     rating: 94, 
     distance: 300,
-    helpCount: 12,
+    helpsCount: 52, // Gold badge
     memberSince: '2023-06',
   },
   { 
     id: 'guardian_2', 
+    firstName: 'Lars',
+    lastName: 'Kristensen',
     username: 'lars_k',
-    avatar: getAvatarUrl('lars_k', 'avataaars'), 
+    gender: 'male',
+    avatar: getAvatarUrl('lars_male_1', 'male'), 
     rating: 88, 
     distance: 450,
-    helpCount: 8,
+    helpsCount: 8, // Bronze badge
     memberSince: '2023-09',
   },
   { 
     id: 'guardian_3', 
+    firstName: 'Sofia',
+    lastName: 'Mortensen',
     username: 'sofia_m',
-    avatar: getAvatarUrl('sofia_m', 'avataaars'), 
+    gender: 'female',
+    avatar: getAvatarUrl('sofia_female_1', 'female'), 
     rating: 97, 
     distance: 200,
-    helpCount: 23,
+    helpsCount: 120, // Diamond badge
     memberSince: '2023-03',
   },
   { 
     id: 'guardian_4', 
+    firstName: 'Anders',
+    lastName: 'Johansen',
     username: 'anders_j',
-    avatar: getAvatarUrl('anders_j', 'avataaars'), 
+    gender: 'male',
+    avatar: getAvatarUrl('anders_male_1', 'male'), 
     rating: 91, 
     distance: 600,
-    helpCount: 15,
+    helpsCount: 25, // Silver badge
     memberSince: '2023-07',
   },
   { 
     id: 'guardian_5', 
+    firstName: 'Mia',
+    lastName: 'Nielsen',
     username: 'mia_n',
-    avatar: getAvatarUrl('mia_n', 'avataaars'), 
+    gender: 'female',
+    avatar: getAvatarUrl('mia_female_1', 'female'), 
     rating: 85, 
     distance: 350,
-    helpCount: 5,
+    helpsCount: 3, // Copper badge
     memberSince: '2024-01',
   },
 ];
@@ -122,41 +154,61 @@ export const mockSafePlaces = [
 export const mockTrustedContacts = [
   { 
     id: 'contact_1', 
-    username: 'maria_mom',
+    firstName: 'Maria',
+    lastName: 'Jensen',
+    username: 'maria_j',
+    gender: 'female',
     relationship: 'Family', 
     phone: '+45 12345678',
-    avatar: getAvatarUrl('maria_mom', 'avataaars'),
+    avatar: getAvatarUrl('maria_female_2', 'female'),
+    helpsCount: 15, // Silver badge
   },
   { 
     id: 'contact_2', 
+    firstName: 'Anna',
+    lastName: 'Karlsen',
     username: 'anna_k',
+    gender: 'female',
     relationship: 'Friend', 
     phone: '+45 87654321',
-    avatar: getAvatarUrl('anna_k', 'avataaars'),
+    avatar: getAvatarUrl('anna_female_1', 'female'),
+    helpsCount: 7, // Bronze badge
   },
   { 
     id: 'contact_3', 
+    firstName: 'Michael',
+    lastName: 'Petersen',
     username: 'michael_p',
+    gender: 'male',
     relationship: 'Partner', 
     phone: '+45 55566677',
-    avatar: getAvatarUrl('michael_p', 'avataaars'),
+    avatar: getAvatarUrl('michael_male_1', 'male'),
+    helpsCount: 2, // Copper badge
   },
 ];
 
 export const mockConnectedGuardians = [
   { 
     id: 'connected_1', 
+    firstName: 'Emma',
+    lastName: 'Sørensen',
     username: 'emma_s',
+    gender: 'female',
     helpedOn: '2024-01-15', 
     rating: 'up',
-    avatar: getAvatarUrl('emma_s', 'avataaars'),
+    avatar: getAvatarUrl('emma_female_1', 'female'),
+    helpsCount: 52, // Gold badge
   },
   { 
     id: 'connected_2', 
+    firstName: 'Lars',
+    lastName: 'Kristensen',
     username: 'lars_k',
+    gender: 'male',
     helpedOn: '2024-01-10', 
     rating: 'up',
-    avatar: getAvatarUrl('lars_k', 'avataaars'),
+    avatar: getAvatarUrl('lars_male_1', 'male'),
+    helpsCount: 8, // Bronze badge
   },
 ];
 
@@ -164,8 +216,12 @@ export const mockConnectedGuardians = [
 export const mockSafeCircleUsers = [
   {
     id: 'sc_user_1',
+    firstName: 'Emma',
+    lastName: 'Sørensen',
     username: 'emma_sor',
-    avatar: getAvatarUrl('emma_sor', 'avataaars'),
+    gender: 'female',
+    avatar: getAvatarUrl('emma_female_3', 'female'),
+    helpsCount: 85, // Gold badge
     lastActivity: {
       type: 'helped_you', // This person helped you
       date: '2024-11-28',
@@ -178,8 +234,12 @@ export const mockSafeCircleUsers = [
   },
   {
     id: 'sc_user_2',
+    firstName: 'Laura',
+    lastName: 'Karlsen',
     username: 'laura_k',
-    avatar: getAvatarUrl('laura_k', 'avataaars'),
+    gender: 'female',
+    avatar: getAvatarUrl('laura_female_1', 'female'),
+    helpsCount: 3, // Copper badge
     lastActivity: {
       type: 'you_helped', // You helped this person
       date: '2024-11-25',
@@ -196,8 +256,12 @@ export const mockSafeCircleUsers = [
   },
   {
     id: 'sc_user_3',
+    firstName: 'Sofia',
+    lastName: 'Madsen',
     username: 'sofia_mad',
-    avatar: getAvatarUrl('sofia_mad', 'avataaars'),
+    gender: 'female',
+    avatar: getAvatarUrl('sofia_female_2', 'female'),
+    helpsCount: 150, // Diamond badge
     lastActivity: {
       type: 'helped_you',
       date: '2024-11-20',
@@ -210,8 +274,12 @@ export const mockSafeCircleUsers = [
   },
   {
     id: 'sc_user_4',
+    firstName: 'Anna',
+    lastName: 'Jensen',
     username: 'anna_jen',
-    avatar: getAvatarUrl('anna_jen', 'avataaars'),
+    gender: 'female',
+    avatar: getAvatarUrl('anna_female_2', 'female'),
+    helpsCount: 12, // Silver badge
     lastActivity: {
       type: 'you_helped',
       date: '2024-11-15',
@@ -228,8 +296,12 @@ export const mockSafeCircleUsers = [
   },
   {
     id: 'sc_user_5',
+    firstName: 'Mia',
+    lastName: 'Nielsen',
     username: 'mia_nie',
-    avatar: getAvatarUrl('mia_nie', 'avataaars'),
+    gender: 'female',
+    avatar: getAvatarUrl('mia_female_2', 'female'),
+    helpsCount: 6, // Bronze badge
     lastActivity: {
       type: 'helped_you',
       date: '2024-11-10',
@@ -242,8 +314,12 @@ export const mockSafeCircleUsers = [
   },
   {
     id: 'sc_user_6',
+    firstName: 'Caroline',
+    lastName: 'Hansen',
     username: 'caroline_h',
-    avatar: getAvatarUrl('caroline_h', 'avataaars'),
+    gender: 'female',
+    avatar: getAvatarUrl('caroline_female_1', 'female'),
+    helpsCount: 0, // No badge
     lastActivity: {
       type: 'you_helped',
       date: '2024-11-05',
@@ -260,10 +336,12 @@ export const mockSafeCircleUsers = [
 export const mockCallersNeedingHelp = [
   {
     id: 'caller_1',
-    username: 'maria_l',
     firstName: 'Maria',
     lastName: 'Lindgren',
-    avatar: getAvatarUrl('maria_lindgren', 'avataaars'),
+    username: 'maria_l',
+    gender: 'female',
+    avatar: getAvatarUrl('maria_female_3', 'female'),
+    helpsCount: 2, // Copper badge
     distance: 300, // meters
     walkTime: 3, // minutes
     location: {
@@ -275,10 +353,12 @@ export const mockCallersNeedingHelp = [
   },
   {
     id: 'caller_2',
-    username: 'sofia_n',
     firstName: 'Sofia',
     lastName: 'Nielsen',
-    avatar: getAvatarUrl('sofia_nielsen', 'avataaars'),
+    username: 'sofia_n',
+    gender: 'female',
+    avatar: getAvatarUrl('sofia_female_3', 'female'),
+    helpsCount: 18, // Silver badge
     distance: 450,
     walkTime: 5,
     location: {
@@ -290,10 +370,12 @@ export const mockCallersNeedingHelp = [
   },
   {
     id: 'caller_3',
-    username: 'emma_h',
     firstName: 'Emma',
     lastName: 'Hansen',
-    avatar: getAvatarUrl('emma_hansen', 'avataaars'),
+    username: 'emma_h',
+    gender: 'female',
+    avatar: getAvatarUrl('emma_female_4', 'female'),
+    helpsCount: 0, // No badge
     distance: 600,
     walkTime: 7,
     location: {
@@ -305,10 +387,12 @@ export const mockCallersNeedingHelp = [
   },
   {
     id: 'caller_4',
-    username: 'lisa_k',
     firstName: 'Lisa',
     lastName: 'Karlsson',
-    avatar: getAvatarUrl('lisa_karlsson', 'avataaars'),
+    username: 'lisa_k',
+    gender: 'female',
+    avatar: getAvatarUrl('lisa_female_1', 'female'),
+    helpsCount: 7, // Bronze badge
     distance: 250,
     walkTime: 2,
     location: {
@@ -320,10 +404,12 @@ export const mockCallersNeedingHelp = [
   },
   {
     id: 'caller_5',
-    username: 'anna_m',
     firstName: 'Anna',
     lastName: 'Madsen',
-    avatar: getAvatarUrl('anna_madsen', 'avataaars'),
+    username: 'anna_m',
+    gender: 'female',
+    avatar: getAvatarUrl('anna_female_3', 'female'),
+    helpsCount: 65, // Gold badge
     distance: 500,
     walkTime: 6,
     location: {

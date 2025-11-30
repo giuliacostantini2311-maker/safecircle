@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useLocation } from '../../context/LocationContext';
+import { useAuth } from '../../context/AuthContext';
 import Button from '../../components/Button';
 import Avatar from '../../components/Avatar';
 import GuardianCard from '../../components/GuardianCard';
@@ -21,7 +22,7 @@ import SafetyMap from '../../components/SafetyMap';
 import RatingModal from '../../components/RatingModal';
 import { colors, spacing, typography } from '../../styles/colors';
 import { RADIUS_OPTIONS, DEFAULT_RADIUS } from '../../utils/constants';
-import { mockGuardians, mockChatMessages, mockQuickReplies } from '../../services/mockData';
+import { mockGuardians, mockChatMessages, mockQuickReplies, getDisplayName } from '../../services/mockData';
 
 const STATES = {
   INITIAL: 'initial',
@@ -31,10 +32,12 @@ const STATES = {
 
 export default function GuardianModeScreen({ navigation }) {
   const { location, getCurrentLocation } = useLocation();
+  const { user } = useAuth();
   
   const [state, setState] = useState(STATES.INITIAL);
   const [selectedRadius, setSelectedRadius] = useState(DEFAULT_RADIUS);
   const [context, setContext] = useState('');
+  const [genderPreference, setGenderPreference] = useState('anyone'); // 'anyone' or 'same'
   const [connectedGuardian, setConnectedGuardian] = useState(null);
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
@@ -47,6 +50,16 @@ export default function GuardianModeScreen({ navigation }) {
   useEffect(() => {
     getCurrentLocation();
   }, []);
+
+  // Filter guardians based on gender preference
+  const getFilteredGuardians = () => {
+    if (genderPreference === 'anyone') {
+      return mockGuardians;
+    }
+    // Filter to same gender
+    const userGender = user?.gender || 'female';
+    return mockGuardians.filter(g => g.gender === userGender);
+  };
 
   const handleAlertGuardians = () => {
     setState(STATES.SEARCHING);
@@ -62,7 +75,9 @@ export default function GuardianModeScreen({ navigation }) {
 
     setTimeout(() => {
       clearInterval(interval);
-      const guardian = mockGuardians[0];
+      // Get guardians based on gender preference
+      const availableGuardians = getFilteredGuardians();
+      const guardian = availableGuardians[0] || mockGuardians[0];
       setConnectedGuardian(guardian);
       setMessages(mockChatMessages);
       setState(STATES.CONNECTED);
@@ -130,7 +145,20 @@ export default function GuardianModeScreen({ navigation }) {
     setShowRatingModal(true);
   };
 
-  const handleRatingSubmit = (rating) => {
+  const handleRatingSubmit = (ratingData) => {
+    // If user wants to connect, the guardian is added to trusted contacts
+    if (ratingData.addToNetwork && connectedGuardian) {
+      // In a real app, this would call an API to add to trusted contacts
+      console.log('Adding guardian to trusted contacts:', connectedGuardian);
+      // Show a brief confirmation (could use a toast in real app)
+      alert(`${getDisplayName(connectedGuardian.firstName, connectedGuardian.lastName)} has been added to your trusted contacts!`);
+    }
+    
+    // If negative rating, log the reason (would be sent to backend in real app)
+    if (ratingData.rating === 'down' && ratingData.negativeReason) {
+      console.log('Negative feedback reason:', ratingData.negativeReason);
+    }
+    
     setShowRatingModal(false);
     navigation.goBack();
   };
@@ -149,7 +177,7 @@ export default function GuardianModeScreen({ navigation }) {
   if (state === STATES.INITIAL) {
     return (
       <SafeAreaView style={styles.container} edges={['bottom']}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent}>
           <View style={styles.iconSection}>
             <View style={styles.iconContainer}>
               <Feather name="users" size={56} color={colors.guardian} />
@@ -184,6 +212,53 @@ export default function GuardianModeScreen({ navigation }) {
                 </TouchableOpacity>
               ))}
             </View>
+          </View>
+
+          {/* Gender Preference */}
+          <View style={styles.genderPrefSection}>
+            <Text style={styles.sectionLabel}>Who can help you?</Text>
+            <View style={styles.genderPrefOptions}>
+              <TouchableOpacity
+                style={[
+                  styles.genderPrefButton,
+                  genderPreference === 'anyone' && styles.genderPrefButtonActive,
+                ]}
+                onPress={() => setGenderPreference('anyone')}
+              >
+                <Feather 
+                  name="users" 
+                  size={18} 
+                  color={genderPreference === 'anyone' ? colors.textLight : colors.guardian} 
+                />
+                <Text style={[
+                  styles.genderPrefText,
+                  genderPreference === 'anyone' && styles.genderPrefTextActive,
+                ]}>Anyone</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[
+                  styles.genderPrefButton,
+                  genderPreference === 'same' && styles.genderPrefButtonActive,
+                ]}
+                onPress={() => setGenderPreference('same')}
+              >
+                <Feather 
+                  name="user" 
+                  size={18} 
+                  color={genderPreference === 'same' ? colors.textLight : colors.guardian} 
+                />
+                <Text style={[
+                  styles.genderPrefText,
+                  genderPreference === 'same' && styles.genderPrefTextActive,
+                ]}>Same gender only</Text>
+              </TouchableOpacity>
+            </View>
+            {genderPreference === 'same' && (
+              <Text style={styles.genderPrefNote}>
+                Only {user?.gender || 'female'} guardians will be shown
+              </Text>
+            )}
           </View>
 
           <View style={styles.contextSection}>
@@ -265,14 +340,14 @@ export default function GuardianModeScreen({ navigation }) {
       >
         <View style={styles.guardianHeader}>
           <Avatar
-            name={connectedGuardian?.username}
+            name={getDisplayName(connectedGuardian?.firstName, connectedGuardian?.lastName)}
             source={connectedGuardian?.avatar}
             size={46}
-            showOnlineIndicator
-            isOnline
+            showBadge
+            helpsCount={connectedGuardian?.helpsCount}
           />
           <View style={styles.guardianInfo}>
-            <Text style={styles.guardianName}>{connectedGuardian?.username}</Text>
+            <Text style={styles.guardianName}>{getDisplayName(connectedGuardian?.firstName, connectedGuardian?.lastName)}</Text>
             <View style={styles.guardianMeta}>
               <Feather name="thumbs-up" size={12} color={colors.safe} />
               <Text style={styles.guardianRating}>{connectedGuardian?.rating}%</Text>
@@ -281,6 +356,15 @@ export default function GuardianModeScreen({ navigation }) {
               </Text>
             </View>
           </View>
+          <TouchableOpacity
+            style={styles.callGuardianButton}
+            onPress={() => {
+              // In a real app, this would initiate a phone call
+              alert('Calling guardian...');
+            }}
+          >
+            <Feather name="phone" size={20} color={colors.primary} />
+          </TouchableOpacity>
         </View>
 
         <ScrollView
@@ -363,19 +447,25 @@ export default function GuardianModeScreen({ navigation }) {
 
         <View style={styles.bottomActions}>
           <Button
+            title="Cancel Request"
+            onPress={() => navigation.navigate('Home')}
+            variant="primary"
+            icon="x-circle"
+            style={styles.actionButton}
+          />
+          <Button
             title="Call Police"
             onPress={() => navigation.replace('PoliceMode')}
-            variant="outline"
-            icon="call"
-            style={styles.policeButton}
-            textStyle={{ color: colors.emergency }}
+            variant="emergency"
+            icon="phone-call"
+            style={styles.actionButton}
           />
           <Button
             title="I'm Safe"
             onPress={handleEndSession}
             variant="safe"
-            icon="checkmark-circle"
-            style={styles.endButton}
+            icon="check-circle"
+            style={styles.actionButton}
           />
         </View>
       </KeyboardAvoidingView>
@@ -450,6 +540,46 @@ const styles = StyleSheet.create({
   },
   radiusButtonTextActive: {
     color: colors.textLight,
+  },
+  // Gender Preference Section
+  genderPrefSection: {
+    marginBottom: spacing.lg,
+  },
+  genderPrefOptions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  genderPrefButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    marginHorizontal: 4,
+    borderRadius: 12,
+    backgroundColor: colors.backgroundAlt,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+  },
+  genderPrefButtonActive: {
+    backgroundColor: colors.guardian,
+    borderColor: colors.guardian,
+  },
+  genderPrefText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text,
+    marginLeft: 8,
+  },
+  genderPrefTextActive: {
+    color: colors.textLight,
+  },
+  genderPrefNote: {
+    fontSize: 12,
+    color: colors.guardian,
+    marginTop: spacing.sm,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
   contextSection: {
     marginBottom: spacing.xl,
@@ -537,6 +667,16 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   guardianInfo: {
+    flex: 1,
+    marginLeft: spacing.sm,
+  },
+  callGuardianButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: `${colors.primary}15`,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginLeft: spacing.sm,
   },
   guardianName: {
@@ -646,13 +786,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
-  policeButton: {
+  actionButton: {
     flex: 1,
-    marginRight: spacing.sm,
-    borderColor: colors.emergency,
-  },
-  endButton: {
-    flex: 1,
-    marginLeft: spacing.sm,
+    marginHorizontal: 4,
   },
 });

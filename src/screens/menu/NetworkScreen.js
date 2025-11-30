@@ -16,7 +16,7 @@ import Input from '../../components/Input';
 import { AlertModal } from '../../components/Modal';
 import { useAuth } from '../../context/AuthContext';
 import { colors, spacing, typography } from '../../styles/colors';
-import { mockTrustedContacts, mockSafeCircleUsers, mockGuardians } from '../../services/mockData';
+import { mockTrustedContacts, mockSafeCircleUsers, mockGuardians, getDisplayName } from '../../services/mockData';
 
 const TABS = [
   { id: 'trusted', label: 'Trusted' },
@@ -101,11 +101,19 @@ export default function NetworkScreen({ navigation }) {
       )
     : [];
 
-  const renderTrustedContact = ({ item }) => (
+  const renderTrustedContact = ({ item }) => {
+    const displayName = getDisplayName(item.firstName, item.lastName);
+    return (
     <View style={styles.contactCard}>
-      <Avatar name={item.username} source={item.avatar} size={46} />
+      <Avatar 
+        name={displayName} 
+        source={item.avatar} 
+        size={46}
+        showBadge
+        helpsCount={item.helpsCount}
+      />
       <View style={styles.contactInfo}>
-        <Text style={styles.contactName}>{item.username}</Text>
+        <Text style={styles.contactName}>{displayName}</Text>
         <View style={styles.relationshipBadge}>
           <Text style={styles.relationshipText}>{item.relationship}</Text>
         </View>
@@ -118,8 +126,10 @@ export default function NetworkScreen({ navigation }) {
       </TouchableOpacity>
     </View>
   );
+  };
 
   const renderSafeCircleUser = ({ item }) => {
+    const displayName = getDisplayName(item.firstName, item.lastName);
     const isHelpedYou = item.lastActivity.type === 'helped_you';
     const activityText = isHelpedYou 
       ? `Saved you on ${formatDate(item.lastActivity.date)}`
@@ -132,9 +142,15 @@ export default function NetworkScreen({ navigation }) {
       <View style={styles.safeCircleCard}>
         {/* Main user info row */}
         <View style={styles.safeCircleMain}>
-          <Avatar name={item.username} source={item.avatar} size={50} />
+          <Avatar 
+            name={displayName} 
+            source={item.avatar} 
+            size={50}
+            showBadge
+            helpsCount={item.helpsCount}
+          />
           <View style={styles.safeCircleInfo}>
-            <Text style={styles.safeCircleName}>{item.username}</Text>
+            <Text style={styles.safeCircleName}>{displayName}</Text>
             <View style={styles.activityRow}>
               <Feather 
                 name={isHelpedYou ? "heart" : "shield"} 
@@ -186,12 +202,19 @@ export default function NetworkScreen({ navigation }) {
 
   const renderSearchResult = ({ item }) => {
     const connected = isUserConnected(item.id);
+    const displayName = getDisplayName(item.firstName, item.lastName);
     
     return (
       <View style={styles.searchResultCard}>
-        <Avatar name={item.username} source={item.avatar} size={46} />
+        <Avatar 
+          name={displayName} 
+          source={item.avatar} 
+          size={46}
+          showBadge
+          helpsCount={item.helpsCount}
+        />
         <View style={styles.searchResultInfo}>
-          <Text style={styles.searchResultName}>{item.username}</Text>
+          <Text style={styles.searchResultName}>{displayName}</Text>
           <View style={styles.searchResultMeta}>
             <Feather name="thumbs-up" size={12} color={colors.safe} />
             <Text style={styles.searchResultRating}>{item.rating}%</Text>
@@ -377,7 +400,7 @@ export default function NetworkScreen({ navigation }) {
             {/* Header */}
             <Text style={styles.noteModalTitle}>Thank You Note</Text>
             <Text style={styles.noteModalSubtitle}>
-              from {selectedNote?.username || ''}
+              from {selectedNote ? getDisplayName(selectedNote.firstName, selectedNote.lastName) : ''}
             </Text>
 
             {/* Letter Content */}
@@ -388,7 +411,7 @@ export default function NetworkScreen({ navigation }) {
                   {selectedNote?.thankYouNote?.message || 'No message'}
                 </Text>
                 <Text style={styles.letterSignature}>
-                  — {selectedNote?.username || ''}
+                  — {selectedNote ? getDisplayName(selectedNote.firstName, selectedNote.lastName) : ''}
                 </Text>
               </View>
             </ScrollView>

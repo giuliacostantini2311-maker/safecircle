@@ -33,7 +33,7 @@ const CARDS = [
     id: 'guardian-mode',
     icon: 'users',
     iconColor: colors.guardian,
-    title: 'Guardian Mode',
+    title: 'Call Guardian',
     description: 'Need backup? Alert nearby community members who can chat with you, virtually walk you home, or even come to your location if needed.',
   },
   {
@@ -41,14 +41,21 @@ const CARDS = [
     icon: 'heart',
     iconColor: colors.safe,
     title: 'Become a Guardian',
-    description: "When someone nearby activates Guardian Mode, you'll receive an alert. Accept to help them feel safe. Build your reputation as a trusted community member.",
+    description: "When someone nearby calls for a guardian, you'll receive an alert. Accept to help them feel safe. Build your reputation as a trusted community member.",
   },
   {
     id: 'police-mode',
     icon: 'phone-call',
     iconColor: colors.emergency,
-    title: 'Police Mode',
+    title: 'Call Police',
     description: 'Real emergency? One tap connects you to emergency services while simultaneously alerting nearby users who might be able to assist immediately.',
+  },
+  {
+    id: 'badges',
+    icon: 'award',
+    iconColor: '#FFD700',
+    title: 'Guardian Badges',
+    description: 'Earn badges by helping others! Start at Copper (1-4 helps), progress to Bronze, Silver, Gold, and reach Diamond status at 100+ helps. Your badge shows on your profile.',
   },
   {
     id: 'network',

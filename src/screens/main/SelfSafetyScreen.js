@@ -109,7 +109,7 @@ export default function SelfSafetyScreen({ navigation }) {
   if (!isActive) {
     return (
       <SafeAreaView style={styles.container} edges={['bottom']}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent}>
           {/* Icon */}
           <View style={styles.iconSection}>
             <View style={styles.iconContainer}>
@@ -151,11 +151,11 @@ export default function SelfSafetyScreen({ navigation }) {
 
           {/* Activate Button */}
           <Button
-            title="I Don't Feel Safe"
+            title="Activate Self Safety Mode"
             onPress={handleActivate}
             variant="primary"
             size="large"
-            icon="alert-circle"
+            icon="shield"
             style={styles.activateButton}
           />
         </ScrollView>
@@ -192,7 +192,7 @@ export default function SelfSafetyScreen({ navigation }) {
       {/* Bottom Actions */}
       <View style={styles.bottomActions}>
         <Button
-          title="Upgrade to Guardian Mode"
+          title="Call the Guardian"
           onPress={() => navigation.replace('GuardianMode')}
           variant="guardian"
           icon="people"
@@ -203,10 +203,9 @@ export default function SelfSafetyScreen({ navigation }) {
           <Button
             title="Call Police"
             onPress={() => navigation.replace('PoliceMode')}
-            variant="outline"
-            icon="call"
+            variant="emergency"
+            icon="phone-call"
             style={styles.policeButton}
-            textStyle={{ color: colors.emergency }}
           />
           
           <Button

@@ -194,9 +194,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   iconLeft: {
-    marginRight: 10,
+    marginRight: 6,
   },
   iconRight: {
-    marginLeft: 10,
+    marginLeft: 6,
   },
 });

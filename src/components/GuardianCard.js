@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import Avatar from './Avatar';
 import { colors, spacing } from '../styles/colors';
+import { getDisplayName } from '../services/mockData';
 
 export default function GuardianCard({
   guardian,
@@ -32,6 +33,8 @@ export default function GuardianCard({
     );
   }
 
+  const displayName = getDisplayName(guardian.firstName, guardian.lastName);
+  
   return (
     <TouchableOpacity
       style={styles.card}
@@ -39,15 +42,15 @@ export default function GuardianCard({
       activeOpacity={onPress ? 0.8 : 1}
     >
       <Avatar
-        name={guardian.username}
+        name={displayName}
         source={guardian.avatar}
         size={50}
-        showOnlineIndicator={variant === 'default'}
-        isOnline={true}
+        showBadge
+        helpsCount={guardian.helpsCount}
       />
       
       <View style={styles.info}>
-        <Text style={styles.name}>{guardian.username}</Text>
+        <Text style={styles.name}>{displayName}</Text>
         
         {variant === 'default' && (
           <View style={styles.details}>

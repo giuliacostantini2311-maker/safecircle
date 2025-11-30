@@ -21,6 +21,7 @@ export default function SafetyMap({
   radius = 500,
   onSafePlacePress,
   style = {},
+  locationLabel = null, // Custom label for the location (e.g., "Caller's location")
 }) {
   const location = userLocation || DEFAULT_COORDS;
   const lat = location.latitude;
@@ -112,11 +113,11 @@ export default function SafetyMap({
           <View style={styles.pinShadow} />
         </View>
 
-        {/* Guardian indicator */}
-        {guardianLocation && (
+        {/* Location indicator */}
+        {(guardianLocation || locationLabel) && (
           <View style={styles.guardianIndicator}>
             <Feather name="user" size={14} color={colors.textLight} />
-            <Text style={styles.guardianText}>Guardian nearby</Text>
+            <Text style={styles.guardianText}>{locationLabel || 'Guardian nearby'}</Text>
           </View>
         )}
 

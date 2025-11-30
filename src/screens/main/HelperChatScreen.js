@@ -16,8 +16,9 @@ import { Feather } from '@expo/vector-icons';
 import Avatar from '../../components/Avatar';
 import Button from '../../components/Button';
 import SlideToConfirm from '../../components/SlideToConfirm';
+import SafetyMap from '../../components/SafetyMap';
 import { colors, spacing, typography } from '../../styles/colors';
-import { guardianLevels } from '../../services/mockData';
+import { guardianLevels, getDisplayName } from '../../services/mockData';
 
 const { width } = Dimensions.get('window');
 
@@ -38,7 +39,7 @@ export default function HelperChatScreen({ route, navigation }) {
   const [callerSafe, setCallerSafe] = useState(false);
   const [showMilestoneModal, setShowMilestoneModal] = useState(false);
   
-  const callerDisplayName = caller.username;
+  const callerDisplayName = getDisplayName(caller.firstName, caller.lastName);
 
   // Simulate getting current guardian level (would come from user data in real app)
   const currentHelps = 0; // First help
@@ -139,8 +140,8 @@ export default function HelperChatScreen({ route, navigation }) {
             name={callerDisplayName}
             source={caller.avatar}
             size={50}
-            showOnlineIndicator
-            isOnline
+            showBadge
+            helpsCount={caller.helpsCount}
           />
           <View style={styles.callerInfo}>
             <Text style={styles.callerName}>{callerDisplayName}</Text>
@@ -153,18 +154,23 @@ export default function HelperChatScreen({ route, navigation }) {
           </View>
         </View>
 
-        {/* Map Preview */}
+        {/* Live Location Map */}
         <View style={styles.mapContainer}>
-          <View style={styles.mapPlaceholder}>
-            <Feather name="map" size={32} color={colors.textMuted} />
-            <Text style={styles.mapPlaceholderText}>Live Location</Text>
-            <View style={styles.mapPin}>
-              <Feather name="map-pin" size={24} color={colors.emergency} />
-            </View>
-          </View>
+          <SafetyMap
+            userLocation={{
+              latitude: caller.location?.lat || 55.6762,
+              longitude: caller.location?.lng || 12.5684,
+            }}
+            locationLabel={`${callerDisplayName}'s location`}
+            style={styles.safetyMap}
+          />
           <View style={styles.mapOverlay}>
+            <View style={styles.liveIndicator}>
+              <View style={styles.liveDot} />
+              <Text style={styles.liveText}>LIVE</Text>
+            </View>
             <Text style={styles.mapOverlayText}>
-              📍 {callerDisplayName}'s live location
+              {callerDisplayName}'s location
             </Text>
           </View>
         </View>
@@ -327,37 +333,48 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   mapContainer: {
-    height: 150,
+    height: 200,
     margin: spacing.md,
     borderRadius: 16,
     overflow: 'hidden',
     backgroundColor: colors.backgroundAlt,
     borderWidth: 1,
     borderColor: colors.border,
+    position: 'relative',
   },
-  mapPlaceholder: {
+  safetyMap: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  mapPlaceholderText: {
-    fontSize: 14,
-    color: colors.textMuted,
-    marginTop: spacing.xs,
-  },
-  mapPin: {
-    position: 'absolute',
-    top: '40%',
-    left: '55%',
+    borderRadius: 0,
+    borderWidth: 0,
   },
   mapOverlay: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
+    top: spacing.sm,
+    left: spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    borderRadius: 20,
+  },
+  liveIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: spacing.sm,
+  },
+  liveDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.emergency,
+    marginRight: 4,
+  },
+  liveText: {
+    color: colors.emergency,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
   mapOverlayText: {
     color: colors.white,
