@@ -14,6 +14,7 @@ import { useLocation } from '../../context/LocationContext';
 import Avatar from '../../components/Avatar';
 import { colors, spacing, typography } from '../../styles/colors';
 import { getGreeting } from '../../utils/constants';
+import { mockCallersNeedingHelp } from '../../services/mockData';
 
 export default function HomeScreen({ navigation }) {
   const { user, logout } = useAuth();
@@ -21,6 +22,7 @@ export default function HomeScreen({ navigation }) {
   
   const [menuVisible, setMenuVisible] = useState(false);
   const [greeting, setGreeting] = useState({ greeting: '', subtitle: '' });
+  const [callersNeedingHelp] = useState(mockCallersNeedingHelp);
 
   useEffect(() => {
     // Use username, or firstName, or 'there' as fallback
@@ -110,7 +112,7 @@ export default function HomeScreen({ navigation }) {
                 <Feather name="users" size={26} color={colors.guardian} />
               </View>
               <View style={styles.modeCardInfo}>
-                <Text style={styles.modeCardTitle}>Guardian Mode</Text>
+                <Text style={styles.modeCardTitle}>Call Guardian</Text>
                 <Text style={styles.modeCardSubtitle}>Alert nearby guardians</Text>
               </View>
               <Feather name="chevron-right" size={22} color={colors.textMuted} />
@@ -129,13 +131,35 @@ export default function HomeScreen({ navigation }) {
                 <Feather name="phone-call" size={26} color={colors.emergency} />
               </View>
               <View style={styles.modeCardInfo}>
-                <Text style={styles.modeCardTitle}>Police Mode</Text>
+                <Text style={styles.modeCardTitle}>Call Police</Text>
                 <Text style={styles.modeCardSubtitle}>Immediate emergency help</Text>
               </View>
               <Feather name="chevron-right" size={22} color={colors.textMuted} />
             </View>
           </TouchableOpacity>
         </View>
+
+        {/* Callers Needing Help - Compact Section */}
+        {callersNeedingHelp.length > 0 && (
+          <TouchableOpacity
+            style={styles.callersSection}
+            onPress={() => navigation.navigate('CallersNeedingHelp')}
+            activeOpacity={0.8}
+          >
+            <View style={styles.callersSectionLeft}>
+              <View style={styles.callersIconContainer}>
+                <Feather name="alert-circle" size={20} color={colors.white} />
+              </View>
+              <View style={styles.callersInfo}>
+                <Text style={styles.callersTitle}>
+                  {callersNeedingHelp.length} {callersNeedingHelp.length === 1 ? 'person needs' : 'people need'} help
+                </Text>
+                <Text style={styles.callersSubtitle}>Tap to help someone nearby</Text>
+              </View>
+            </View>
+            <Feather name="chevron-right" size={22} color={colors.emergency} />
+          </TouchableOpacity>
+        )}
       </ScrollView>
 
       {/* Status Bar */}
@@ -279,6 +303,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     letterSpacing: 0.1,
   },
+  // Mode Cards
   modeCards: {
     marginBottom: spacing.lg,
   },
@@ -339,6 +364,45 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textSecondary,
   },
+  // Callers Section - Compact
+  callersSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: `${colors.emergency}08`,
+    borderRadius: 14,
+    padding: spacing.md,
+    borderWidth: 1.5,
+    borderColor: `${colors.emergency}30`,
+  },
+  callersSectionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  callersIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: colors.emergency,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.md,
+  },
+  callersInfo: {
+    flex: 1,
+  },
+  callersTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.emergency,
+    marginBottom: 2,
+  },
+  callersSubtitle: {
+    fontSize: 13,
+    color: colors.textSecondary,
+  },
+  // Status Bar
   statusBar: {
     flexDirection: 'row',
     justifyContent: 'center',

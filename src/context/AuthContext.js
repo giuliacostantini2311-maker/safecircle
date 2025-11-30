@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, useRef } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Initial state
 const initialState = {
@@ -7,6 +8,12 @@ const initialState = {
   isAuthenticated: false,
   hasCompletedPermissions: false,
   error: null,
+};
+
+// Storage keys
+const STORAGE_KEYS = {
+  USER_DATA: '@safecircle:user',
+  REGISTERED_USERS: '@safecircle:registeredUsers',
 };
 
 // Action types
@@ -82,17 +89,53 @@ export const AuthProvider = ({ children }) => {
   // In-memory storage for registered users (simulates a database)
   const registeredUsers = useRef({});
 
-  // Check for existing session on mount
+  // Load persisted data on mount
   useEffect(() => {
-    const checkAuthState = async () => {
-      // Simulate checking for stored auth
-      setTimeout(() => {
+    const loadPersistedData = async () => {
+      try {
+        // Load registered users
+        const storedUsers = await AsyncStorage.getItem(STORAGE_KEYS.REGISTERED_USERS);
+        if (storedUsers) {
+          registeredUsers.current = JSON.parse(storedUsers);
+        }
+
+        // Load current user session
+        const storedUser = await AsyncStorage.getItem(STORAGE_KEYS.USER_DATA);
+        if (storedUser) {
+          const user = JSON.parse(storedUser);
+          dispatch({ type: AUTH_ACTIONS.LOGIN_SUCCESS, payload: user });
+        } else {
+          dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+        }
+      } catch (error) {
+        console.error('Error loading persisted data:', error);
         dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
-      }, 1000);
+      }
     };
 
-    checkAuthState();
+    loadPersistedData();
   }, []);
+
+  // Save registered users to storage
+  const saveRegisteredUsers = async () => {
+    try {
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.REGISTERED_USERS,
+        JSON.stringify(registeredUsers.current)
+      );
+    } catch (error) {
+      console.error('Error saving registered users:', error);
+    }
+  };
+
+  // Save current user to storage
+  const saveCurrentUser = async (user) => {
+    try {
+      await AsyncStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
+    } catch (error) {
+      console.error('Error saving user data:', error);
+    }
+  };
 
   // Login function
   const login = async (emailOrUsername, password) => {
@@ -104,7 +147,9 @@ export const AuthProvider = ({ children }) => {
       
       if (emailOrUsername && password) {
         // Check if user exists in registered users (by email or username)
-        const users = Object.values(registeredUsers.current);
+        const users = Object.values(registeredUsers.current).filter(
+          u => u.id && !u.id.startsWith('email_') && !u.id.startsWith('username_')
+        );
         const existingUser = users.find(
           u => u.email?.toLowerCase() === emailOrUsername.toLowerCase() || 
                u.username?.toLowerCase() === emailOrUsername.toLowerCase()
@@ -112,6 +157,7 @@ export const AuthProvider = ({ children }) => {
         
         if (existingUser) {
           // User found - use their actual data
+          await saveCurrentUser(existingUser);
           dispatch({ type: AUTH_ACTIONS.LOGIN_SUCCESS, payload: existingUser });
         } else {
           // New user logging in - create user from input
@@ -134,6 +180,8 @@ export const AuthProvider = ({ children }) => {
           
           // Store the user
           registeredUsers.current[user.id] = user;
+          await saveRegisteredUsers();
+          await saveCurrentUser(user);
           dispatch({ type: AUTH_ACTIONS.LOGIN_SUCCESS, payload: user });
         }
         return { success: true };
@@ -179,6 +227,8 @@ export const AuthProvider = ({ children }) => {
         registeredUsers.current[`username_${newUser.username.toLowerCase()}`] = newUser;
       }
       
+      await saveRegisteredUsers();
+      await saveCurrentUser(newUser);
       dispatch({ type: AUTH_ACTIONS.LOGIN_SUCCESS, payload: newUser });
       return { success: true };
     } catch (error) {
@@ -189,6 +239,11 @@ export const AuthProvider = ({ children }) => {
 
   // Logout function
   const logout = async () => {
+    try {
+      await AsyncStorage.removeItem(STORAGE_KEYS.USER_DATA);
+    } catch (error) {
+      console.error('Error clearing user data:', error);
+    }
     dispatch({ type: AUTH_ACTIONS.LOGOUT });
   };
 
@@ -197,6 +252,8 @@ export const AuthProvider = ({ children }) => {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const updatedUser = { ...state.user, ...updates };
       dispatch({ type: AUTH_ACTIONS.UPDATE_USER, payload: updates });
       
       // Update in storage
@@ -205,6 +262,19 @@ export const AuthProvider = ({ children }) => {
           ...registeredUsers.current[state.user.id],
           ...updates,
         };
+        
+        // Update indexes if email or username changed
+        if (updates.email && updates.email !== state.user.email) {
+          delete registeredUsers.current[`email_${state.user.email?.toLowerCase()}`];
+          registeredUsers.current[`email_${updates.email.toLowerCase()}`] = updatedUser;
+        }
+        if (updates.username && updates.username !== state.user.username) {
+          delete registeredUsers.current[`username_${state.user.username?.toLowerCase()}`];
+          registeredUsers.current[`username_${updates.username.toLowerCase()}`] = updatedUser;
+        }
+        
+        await saveRegisteredUsers();
+        await saveCurrentUser(updatedUser);
       }
       
       return { success: true };
@@ -218,7 +288,9 @@ export const AuthProvider = ({ children }) => {
     try {
       // Simulate MitID verification
       await new Promise(resolve => setTimeout(resolve, 2000));
+      const updatedUser = { ...state.user, verified: true };
       dispatch({ type: AUTH_ACTIONS.UPDATE_USER, payload: { verified: true } });
+      await saveCurrentUser(updatedUser);
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };

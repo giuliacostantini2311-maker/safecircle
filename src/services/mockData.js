@@ -7,17 +7,22 @@ export const mockUser = {
   email: 'sarah.jensen@example.com',
   phone: '+45 12345678',
   username: 'sarahjensen',
-  avatar: null,
+  avatar: null, // User's uploaded picture will be stored here
   verified: true,
   language: 'en',
   createdAt: '2024-01-01',
+};
+
+// Helper function to generate realistic avatar URLs using DiceBear
+const getAvatarUrl = (seed, style = 'avataaars') => {
+  return `https://api.dicebear.com/7.x/${style}/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
 };
 
 export const mockGuardians = [
   { 
     id: 'guardian_1', 
     username: 'emma_s',
-    avatar: null, 
+    avatar: getAvatarUrl('emma_s', 'avataaars'), 
     rating: 94, 
     distance: 300,
     helpCount: 12,
@@ -26,7 +31,7 @@ export const mockGuardians = [
   { 
     id: 'guardian_2', 
     username: 'lars_k',
-    avatar: null, 
+    avatar: getAvatarUrl('lars_k', 'avataaars'), 
     rating: 88, 
     distance: 450,
     helpCount: 8,
@@ -35,7 +40,7 @@ export const mockGuardians = [
   { 
     id: 'guardian_3', 
     username: 'sofia_m',
-    avatar: null, 
+    avatar: getAvatarUrl('sofia_m', 'avataaars'), 
     rating: 97, 
     distance: 200,
     helpCount: 23,
@@ -44,7 +49,7 @@ export const mockGuardians = [
   { 
     id: 'guardian_4', 
     username: 'anders_j',
-    avatar: null, 
+    avatar: getAvatarUrl('anders_j', 'avataaars'), 
     rating: 91, 
     distance: 600,
     helpCount: 15,
@@ -53,7 +58,7 @@ export const mockGuardians = [
   { 
     id: 'guardian_5', 
     username: 'mia_n',
-    avatar: null, 
+    avatar: getAvatarUrl('mia_n', 'avataaars'), 
     rating: 85, 
     distance: 350,
     helpCount: 5,
@@ -120,21 +125,21 @@ export const mockTrustedContacts = [
     username: 'maria_mom',
     relationship: 'Family', 
     phone: '+45 12345678',
-    avatar: null,
+    avatar: getAvatarUrl('maria_mom', 'avataaars'),
   },
   { 
     id: 'contact_2', 
     username: 'anna_k',
     relationship: 'Friend', 
     phone: '+45 87654321',
-    avatar: null,
+    avatar: getAvatarUrl('anna_k', 'avataaars'),
   },
   { 
     id: 'contact_3', 
     username: 'michael_p',
     relationship: 'Partner', 
     phone: '+45 55566677',
-    avatar: null,
+    avatar: getAvatarUrl('michael_p', 'avataaars'),
   },
 ];
 
@@ -144,14 +149,14 @@ export const mockConnectedGuardians = [
     username: 'emma_s',
     helpedOn: '2024-01-15', 
     rating: 'up',
-    avatar: null,
+    avatar: getAvatarUrl('emma_s', 'avataaars'),
   },
   { 
     id: 'connected_2', 
     username: 'lars_k',
     helpedOn: '2024-01-10', 
     rating: 'up',
-    avatar: null,
+    avatar: getAvatarUrl('lars_k', 'avataaars'),
   },
 ];
 
@@ -160,7 +165,7 @@ export const mockSafeCircleUsers = [
   {
     id: 'sc_user_1',
     username: 'emma_sor',
-    avatar: null,
+    avatar: getAvatarUrl('emma_sor', 'avataaars'),
     lastActivity: {
       type: 'helped_you', // This person helped you
       date: '2024-11-28',
@@ -174,7 +179,7 @@ export const mockSafeCircleUsers = [
   {
     id: 'sc_user_2',
     username: 'laura_k',
-    avatar: null,
+    avatar: getAvatarUrl('laura_k', 'avataaars'),
     lastActivity: {
       type: 'you_helped', // You helped this person
       date: '2024-11-25',
@@ -192,7 +197,7 @@ export const mockSafeCircleUsers = [
   {
     id: 'sc_user_3',
     username: 'sofia_mad',
-    avatar: null,
+    avatar: getAvatarUrl('sofia_mad', 'avataaars'),
     lastActivity: {
       type: 'helped_you',
       date: '2024-11-20',
@@ -206,7 +211,7 @@ export const mockSafeCircleUsers = [
   {
     id: 'sc_user_4',
     username: 'anna_jen',
-    avatar: null,
+    avatar: getAvatarUrl('anna_jen', 'avataaars'),
     lastActivity: {
       type: 'you_helped',
       date: '2024-11-15',
@@ -224,7 +229,7 @@ export const mockSafeCircleUsers = [
   {
     id: 'sc_user_5',
     username: 'mia_nie',
-    avatar: null,
+    avatar: getAvatarUrl('mia_nie', 'avataaars'),
     lastActivity: {
       type: 'helped_you',
       date: '2024-11-10',
@@ -238,7 +243,7 @@ export const mockSafeCircleUsers = [
   {
     id: 'sc_user_6',
     username: 'caroline_h',
-    avatar: null,
+    avatar: getAvatarUrl('caroline_h', 'avataaars'),
     lastActivity: {
       type: 'you_helped',
       date: '2024-11-05',
@@ -249,6 +254,95 @@ export const mockSafeCircleUsers = [
     },
     thankYouNote: null, // No note sent yet
   },
+];
+
+// Callers currently needing help (for Guardian Journey)
+export const mockCallersNeedingHelp = [
+  {
+    id: 'caller_1',
+    username: 'maria_l',
+    firstName: 'Maria',
+    lastName: 'Lindgren',
+    avatar: getAvatarUrl('maria_lindgren', 'avataaars'),
+    distance: 300, // meters
+    walkTime: 3, // minutes
+    location: {
+      lat: 55.6762,
+      lng: 12.5684,
+    },
+    message: "Walking alone. Feeling unsafe. Need company.",
+    requestedAt: new Date().toISOString(),
+  },
+  {
+    id: 'caller_2',
+    username: 'sofia_n',
+    firstName: 'Sofia',
+    lastName: 'Nielsen',
+    avatar: getAvatarUrl('sofia_nielsen', 'avataaars'),
+    distance: 450,
+    walkTime: 5,
+    location: {
+      lat: 55.6771,
+      lng: 12.5691,
+    },
+    message: "Someone following me. Please help.",
+    requestedAt: new Date().toISOString(),
+  },
+  {
+    id: 'caller_3',
+    username: 'emma_h',
+    firstName: 'Emma',
+    lastName: 'Hansen',
+    avatar: getAvatarUrl('emma_hansen', 'avataaars'),
+    distance: 600,
+    walkTime: 7,
+    location: {
+      lat: 55.6750,
+      lng: 12.5670,
+    },
+    message: null, // No message written
+    requestedAt: new Date().toISOString(),
+  },
+  {
+    id: 'caller_4',
+    username: 'lisa_k',
+    firstName: 'Lisa',
+    lastName: 'Karlsson',
+    avatar: getAvatarUrl('lisa_karlsson', 'avataaars'),
+    distance: 250,
+    walkTime: 2,
+    location: {
+      lat: 55.6755,
+      lng: 12.5680,
+    },
+    message: "Dark street. Scared. Can someone come?",
+    requestedAt: new Date().toISOString(),
+  },
+  {
+    id: 'caller_5',
+    username: 'anna_m',
+    firstName: 'Anna',
+    lastName: 'Madsen',
+    avatar: getAvatarUrl('anna_madsen', 'avataaars'),
+    distance: 500,
+    walkTime: 6,
+    location: {
+      lat: 55.6768,
+      lng: 12.5695,
+    },
+    message: null, // No message written
+    requestedAt: new Date().toISOString(),
+  },
+];
+
+// Guardian levels/milestones
+export const guardianLevels = [
+  { level: 1, name: 'Bronze Guardian', helpsRequired: 0, icon: '🥉' },
+  { level: 2, name: 'Copper Guardian', helpsRequired: 1, icon: '🔶' },
+  { level: 3, name: 'Silver Guardian', helpsRequired: 5, icon: '🥈' },
+  { level: 4, name: 'Gold Guardian', helpsRequired: 10, icon: '🥇' },
+  { level: 5, name: 'Platinum Guardian', helpsRequired: 25, icon: '💎' },
+  { level: 6, name: 'Diamond Guardian', helpsRequired: 50, icon: '💠' },
 ];
 
 export const mockChatMessages = [

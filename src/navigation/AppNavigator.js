@@ -15,6 +15,8 @@ import SelfSafetyScreen from '../screens/main/SelfSafetyScreen';
 import GuardianModeScreen from '../screens/main/GuardianModeScreen';
 import PoliceModeScreen from '../screens/main/PoliceModeScreen';
 import GuardianAlertScreen from '../screens/main/GuardianAlertScreen';
+import HelperChatScreen from '../screens/main/HelperChatScreen';
+import CallersNeedingHelpScreen from '../screens/main/CallersNeedingHelpScreen';
 
 // Menu Screens
 import ProfileScreen from '../screens/menu/ProfileScreen';
@@ -99,6 +101,28 @@ const MainStack = () => (
       component={GuardianAlertScreen}
       options={{ 
         title: 'Someone Needs Help',
+        headerStyle: {
+          ...screenOptions.headerStyle,
+          backgroundColor: colors.background,
+        },
+      }}
+    />
+    <Stack.Screen 
+      name="HelperChat" 
+      component={HelperChatScreen}
+      options={{ 
+        title: 'Helping Caller',
+        headerStyle: {
+          ...screenOptions.headerStyle,
+          backgroundColor: colors.background,
+        },
+      }}
+    />
+    <Stack.Screen 
+      name="CallersNeedingHelp" 
+      component={CallersNeedingHelpScreen}
+      options={{ 
+        title: 'Help Someone',
         headerStyle: {
           ...screenOptions.headerStyle,
           backgroundColor: colors.background,

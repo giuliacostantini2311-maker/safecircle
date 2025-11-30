@@ -32,11 +32,20 @@ export default function ProfileScreen({ navigation }) {
   const [showSuccess, setShowSuccess] = useState(false);
 
   const pickImage = async () => {
+    // Request permissions
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Sorry, we need camera roll permissions to upload your profile picture!');
+      return;
+    }
+
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
+      // Accepted formats: JPEG, PNG, WebP, GIF, BMP, TIFF, HEIC (iPhone format)
+      // Note: HEIC images are automatically converted to JPEG by the system
     });
 
     if (!result.canceled) {
@@ -78,6 +87,9 @@ export default function ProfileScreen({ navigation }) {
           <TouchableOpacity onPress={pickImage}>
             <Text style={styles.changePhotoText}>Change Photo</Text>
           </TouchableOpacity>
+          <Text style={styles.formatInfo}>
+            Accepted formats: JPEG, PNG, WebP, GIF, BMP, TIFF, HEIC
+          </Text>
         </View>
 
         {user?.verified && (
@@ -222,6 +234,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.primary,
     fontWeight: '600',
+  },
+  formatInfo: {
+    marginTop: spacing.xs,
+    fontSize: 12,
+    color: colors.textMuted,
+    textAlign: 'center',
   },
   verifiedBadge: {
     flexDirection: 'row',

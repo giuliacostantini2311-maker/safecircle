@@ -66,11 +66,20 @@ export default function SignUpScreen({ navigation }) {
   const [validationErrors, setValidationErrors] = useState({});
 
   const pickImage = async () => {
+    // Request permissions
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Sorry, we need camera roll permissions to upload your profile picture!');
+      return;
+    }
+
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
+      // Accepted formats: JPEG, PNG, WebP, GIF, BMP, TIFF, HEIC (iPhone format)
+      // Note: HEIC images are automatically converted to JPEG by the system
     });
 
     if (!result.canceled) {
@@ -209,18 +218,31 @@ export default function SignUpScreen({ navigation }) {
 
           {/* Avatar Section */}
           <View style={styles.avatarSection}>
-            <Avatar
-              source={avatar}
-              name={fullName || 'User'}
-              size={110}
-              onPress={pickImage}
-              showEditButton
-            />
+            <View style={styles.avatarWrapper}>
+              <Avatar
+                source={avatar}
+                name={fullName || 'User'}
+                size={110}
+                onPress={pickImage}
+                showEditButton
+              />
+              {!avatar && (
+                <View style={styles.requiredBadge}>
+                  <Text style={styles.requiredBadgeText}>*</Text>
+                </View>
+              )}
+            </View>
             <TouchableOpacity onPress={pickImage}>
               <Text style={styles.changePhotoText}>
                 {avatar ? 'Change Photo' : 'Upload Photo *'}
               </Text>
             </TouchableOpacity>
+            <Text style={styles.formatInfo}>
+              Formats: JPEG, PNG, WebP, GIF, BMP, TIFF, HEIC
+            </Text>
+            <Text style={styles.requiredText}>
+              * Required field
+            </Text>
             {validationErrors.avatar && (
               <Text style={styles.avatarError}>{validationErrors.avatar}</Text>
             )}
@@ -470,16 +492,51 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: spacing.xl,
   },
+  avatarWrapper: {
+    position: 'relative',
+  },
+  requiredBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: colors.emergency,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 3,
+    borderColor: colors.background,
+  },
+  requiredBadgeText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: '700',
+  },
   changePhotoText: {
     marginTop: spacing.sm,
     fontSize: 15,
     color: colors.primary,
     fontWeight: '600',
   },
+  formatInfo: {
+    marginTop: spacing.xs,
+    fontSize: 12,
+    color: colors.textMuted,
+    textAlign: 'center',
+  },
+  requiredText: {
+    marginTop: spacing.xs,
+    fontSize: 12,
+    color: colors.emergency,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
   avatarError: {
     marginTop: spacing.xs,
     fontSize: 13,
     color: colors.emergency,
+    fontWeight: '500',
   },
   form: {
     flex: 1,
