@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { colors } from '../styles/colors';
 
 // Auth Screens
+import WelcomeScreen from '../screens/auth/WelcomeScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
 import SignUpScreen from '../screens/auth/SignUpScreen';
 import PermissionsScreen from '../screens/auth/PermissionsScreen';
@@ -46,6 +47,7 @@ const screenOptions = {
 // Auth Stack
 const AuthStack = () => (
   <Stack.Navigator screenOptions={{ ...screenOptions, headerShown: false }}>
+    <Stack.Screen name="Welcome" component={WelcomeScreen} />
     <Stack.Screen name="Login" component={LoginScreen} />
     <Stack.Screen name="SignUp" component={SignUpScreen} />
   </Stack.Navigator>

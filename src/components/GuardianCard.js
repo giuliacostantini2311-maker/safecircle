@@ -39,7 +39,7 @@ export default function GuardianCard({
       activeOpacity={onPress ? 0.8 : 1}
     >
       <Avatar
-        name={guardian.name}
+        name={guardian.username}
         source={guardian.avatar}
         size={50}
         showOnlineIndicator={variant === 'default'}
@@ -47,7 +47,7 @@ export default function GuardianCard({
       />
       
       <View style={styles.info}>
-        <Text style={styles.name}>{guardian.name}</Text>
+        <Text style={styles.name}>{guardian.username}</Text>
         
         {variant === 'default' && (
           <View style={styles.details}>

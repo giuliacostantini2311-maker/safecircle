@@ -74,11 +74,16 @@ export default function Input({
           numberOfLines={numberOfLines}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
+          autoCorrect={false}
+          autoComplete={secureTextEntry ? 'off' : undefined}
+          textContentType={secureTextEntry ? 'oneTimeCode' : undefined}
+          spellCheck={false}
         />
         {secureTextEntry && (
           <TouchableOpacity
             onPress={() => setShowPassword(!showPassword)}
             style={styles.eyeButton}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <Feather
               name={showPassword ? 'eye-off' : 'eye'}
@@ -147,7 +152,8 @@ const styles = StyleSheet.create({
     paddingTop: 14,
   },
   eyeButton: {
-    padding: 4,
+    padding: 8,
+    marginRight: -4,
   },
   errorText: {
     fontSize: 13,

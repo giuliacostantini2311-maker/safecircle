@@ -19,21 +19,35 @@ import { colors, spacing, typography } from '../../styles/colors';
 export default function LoginScreen({ navigation }) {
   const { login, error, clearError } = useAuth();
   
-  const [email, setEmail] = useState('');
+  const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showMitIDModal, setShowMitIDModal] = useState(false);
+  const [mitIDLoading, setMitIDLoading] = useState(false);
 
   const handleLogin = async () => {
-    if (!email || !password) return;
+    if (!emailOrUsername || !password) return;
     
     setLoading(true);
-    await login(email, password);
+    // Determine if input is email or username
+    const isEmail = emailOrUsername.includes('@');
+    await login(isEmail ? emailOrUsername : `${emailOrUsername}@demo.com`, password);
     setLoading(false);
   };
 
   const handleMitIDLogin = () => {
     setShowMitIDModal(true);
+  };
+
+  const simulateMitIDLogin = async () => {
+    setMitIDLoading(true);
+    // Simulate MitID verification
+    setTimeout(async () => {
+      setMitIDLoading(false);
+      setShowMitIDModal(false);
+      // Log in with demo credentials after MitID verification
+      await login('mitid@demo.com', 'mitid123');
+    }, 2000);
   };
 
   return (
@@ -47,27 +61,33 @@ export default function LoginScreen({ navigation }) {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Logo and Header */}
+          {/* Header with Back Button */}
           <View style={styles.header}>
-            <View style={styles.logoContainer}>
-              <Feather name="shield" size={48} color={colors.primary} />
-            </View>
-            <Text style={styles.appName}>SafeCircle</Text>
-            <Text style={styles.tagline}>
-              You're never alone when your{'\n'}community has your back.
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Feather name="arrow-left" size={24} color={colors.text} />
+            </TouchableOpacity>
+          </View>
+
+          {/* Title Section */}
+          <View style={styles.titleSection}>
+            <Text style={styles.title}>Welcome back</Text>
+            <Text style={styles.subtitle}>
+              Log in to your SafeCircle account
             </Text>
           </View>
 
           {/* Login Form */}
           <View style={styles.form}>
             <Input
-              label="Email"
-              placeholder="Enter your email"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
+              label="Email or Username"
+              placeholder="Enter your email or username"
+              value={emailOrUsername}
+              onChangeText={setEmailOrUsername}
               autoCapitalize="none"
-              icon="mail-outline"
+              icon="user"
             />
             
             <Input
@@ -76,18 +96,23 @@ export default function LoginScreen({ navigation }) {
               value={password}
               onChangeText={setPassword}
               secureTextEntry
-              icon="lock-closed-outline"
+              icon="lock"
             />
+
+            <TouchableOpacity style={styles.forgotPassword}>
+              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+            </TouchableOpacity>
 
             {error && (
               <Text style={styles.errorText}>{error}</Text>
             )}
 
             <Button
-              title="Login"
+              title="Log In"
               onPress={handleLogin}
               loading={loading}
-              disabled={!email || !password}
+              disabled={!emailOrUsername || !password}
+              size="large"
               style={styles.loginButton}
             />
 
@@ -97,16 +122,16 @@ export default function LoginScreen({ navigation }) {
               <View style={styles.dividerLine} />
             </View>
 
-            <Button
-              title="Continue with MitID"
+            {/* MitID Login */}
+            <TouchableOpacity
+              style={styles.mitIDButton}
               onPress={handleMitIDLogin}
-              variant="outline"
-              icon="id-card-outline"
-              style={styles.mitidButton}
-            />
-
-            <TouchableOpacity style={styles.forgotPassword}>
-              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+            >
+              <View style={styles.mitIDIcon}>
+                <Feather name="credit-card" size={22} color={colors.primary} />
+              </View>
+              <Text style={styles.mitIDButtonText}>Continue with MitID</Text>
+              <Feather name="chevron-right" size={20} color={colors.textMuted} />
             </TouchableOpacity>
           </View>
 
@@ -123,16 +148,23 @@ export default function LoginScreen({ navigation }) {
       {/* MitID Modal */}
       <AlertModal
         visible={showMitIDModal}
-        onClose={() => setShowMitIDModal(false)}
-        icon="information-circle"
+        onClose={() => !mitIDLoading && setShowMitIDModal(false)}
+        icon={mitIDLoading ? "loader" : "credit-card"}
         iconColor={colors.primary}
-        title="MitID Integration"
-        message="MitID integration coming soon! For this demo, please use email login. You can use any email and password to test the app."
-        buttons={[
+        title={mitIDLoading ? "Connecting to MitID" : "MitID Login"}
+        message={mitIDLoading 
+          ? "Please wait while we verify your identity..." 
+          : "You will be redirected to MitID to verify your identity securely."
+        }
+        buttons={mitIDLoading ? [] : [
           {
-            text: 'Got it',
-            primary: true,
+            text: 'Cancel',
             onPress: () => setShowMitIDModal(false),
+          },
+          {
+            text: 'Continue',
+            primary: true,
+            onPress: simulateMitIDLogin,
           },
         ]}
       />
@@ -154,32 +186,43 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl,
   },
   header: {
-    alignItems: 'center',
-    marginTop: spacing.xxl,
-    marginBottom: spacing.xl,
-  },
-  logoContainer: {
-    width: 96,
-    height: 96,
-    borderRadius: 28,
-    backgroundColor: `${colors.primary}12`,
-    alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: spacing.md,
     marginBottom: spacing.lg,
   },
-  appName: {
-    ...typography.display,
-    color: colors.primary,
-    marginBottom: spacing.sm,
+  backButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: colors.backgroundAlt,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  tagline: {
+  titleSection: {
+    marginBottom: spacing.xl,
+  },
+  title: {
+    ...typography.display,
+    color: colors.text,
+    marginBottom: spacing.xs,
+  },
+  subtitle: {
     ...typography.body,
     color: colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 24,
   },
   form: {
     flex: 1,
+  },
+  forgotPassword: {
+    alignSelf: 'flex-end',
+    marginTop: -spacing.sm,
+    marginBottom: spacing.md,
+    paddingVertical: spacing.xs,
+  },
+  forgotPasswordText: {
+    color: colors.primary,
+    fontSize: 14,
+    fontWeight: '500',
+    letterSpacing: 0.1,
   },
   errorText: {
     color: colors.emergency,
@@ -194,7 +237,7 @@ const styles = StyleSheet.create({
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: spacing.lg,
+    marginVertical: spacing.xl,
   },
   dividerLine: {
     flex: 1,
@@ -207,24 +250,35 @@ const styles = StyleSheet.create({
     fontSize: 14,
     letterSpacing: 0.2,
   },
-  mitidButton: {
-    marginBottom: spacing.md,
-  },
-  forgotPassword: {
+  mitIDButton: {
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: spacing.sm,
+    backgroundColor: colors.backgroundAlt,
+    borderRadius: 14,
+    padding: spacing.md,
+    borderWidth: 1.5,
+    borderColor: colors.border,
   },
-  forgotPasswordText: {
-    color: colors.primary,
-    fontSize: 14,
-    fontWeight: '500',
-    letterSpacing: 0.1,
+  mitIDIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.md,
+  },
+  mitIDButtonText: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: spacing.lg,
+    marginTop: spacing.xl,
     paddingVertical: spacing.md,
   },
   footerText: {

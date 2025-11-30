@@ -23,8 +23,9 @@ export default function HomeScreen({ navigation }) {
   const [greeting, setGreeting] = useState({ greeting: '', subtitle: '' });
 
   useEffect(() => {
-    const firstName = user?.firstName || 'there';
-    setGreeting(getGreeting(firstName));
+    // Use username, or firstName, or 'there' as fallback
+    const displayName = user?.username || user?.firstName || 'there';
+    setGreeting(getGreeting(displayName));
     getCurrentLocation();
   }, [user]);
 
@@ -59,7 +60,7 @@ export default function HomeScreen({ navigation }) {
           onPress={() => navigation.navigate('Profile')}
         >
           <Avatar
-            name={`${user?.firstName} ${user?.lastName}`}
+            name={user?.username || user?.firstName || 'User'}
             source={user?.avatar}
             size={38}
           />
@@ -166,12 +167,12 @@ export default function HomeScreen({ navigation }) {
             {/* Menu Header */}
             <View style={styles.menuHeader}>
               <Avatar
-                name={`${user?.firstName} ${user?.lastName}`}
+                name={user?.username || user?.firstName || 'User'}
                 source={user?.avatar}
                 size={72}
               />
               <Text style={styles.menuUserName}>
-                {user?.firstName} {user?.lastName}
+                {user?.username || 'User'}
               </Text>
               {user?.verified && (
                 <View style={styles.verifiedBadge}>

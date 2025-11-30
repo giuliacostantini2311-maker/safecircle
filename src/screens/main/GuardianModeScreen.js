@@ -265,14 +265,14 @@ export default function GuardianModeScreen({ navigation }) {
       >
         <View style={styles.guardianHeader}>
           <Avatar
-            name={connectedGuardian?.name}
+            name={connectedGuardian?.username}
             source={connectedGuardian?.avatar}
             size={46}
             showOnlineIndicator
             isOnline
           />
           <View style={styles.guardianInfo}>
-            <Text style={styles.guardianName}>{connectedGuardian?.name}</Text>
+            <Text style={styles.guardianName}>{connectedGuardian?.username}</Text>
             <View style={styles.guardianMeta}>
               <Feather name="thumbs-up" size={12} color={colors.safe} />
               <Text style={styles.guardianRating}>{connectedGuardian?.rating}%</Text>

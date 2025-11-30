@@ -16,8 +16,7 @@ export const mockUser = {
 export const mockGuardians = [
   { 
     id: 'guardian_1', 
-    name: 'Emma S.', 
-    firstName: 'Emma',
+    username: 'emma_s',
     avatar: null, 
     rating: 94, 
     distance: 300,
@@ -26,8 +25,7 @@ export const mockGuardians = [
   },
   { 
     id: 'guardian_2', 
-    name: 'Lars K.', 
-    firstName: 'Lars',
+    username: 'lars_k',
     avatar: null, 
     rating: 88, 
     distance: 450,
@@ -36,8 +34,7 @@ export const mockGuardians = [
   },
   { 
     id: 'guardian_3', 
-    name: 'Sofia M.', 
-    firstName: 'Sofia',
+    username: 'sofia_m',
     avatar: null, 
     rating: 97, 
     distance: 200,
@@ -46,8 +43,7 @@ export const mockGuardians = [
   },
   { 
     id: 'guardian_4', 
-    name: 'Anders J.', 
-    firstName: 'Anders',
+    username: 'anders_j',
     avatar: null, 
     rating: 91, 
     distance: 600,
@@ -56,8 +52,7 @@ export const mockGuardians = [
   },
   { 
     id: 'guardian_5', 
-    name: 'Mia N.', 
-    firstName: 'Mia',
+    username: 'mia_n',
     avatar: null, 
     rating: 85, 
     distance: 350,
@@ -122,21 +117,21 @@ export const mockSafePlaces = [
 export const mockTrustedContacts = [
   { 
     id: 'contact_1', 
-    name: 'Mom', 
+    username: 'maria_mom',
     relationship: 'Family', 
     phone: '+45 12345678',
     avatar: null,
   },
   { 
     id: 'contact_2', 
-    name: 'Best Friend Anna', 
+    username: 'anna_k',
     relationship: 'Friend', 
     phone: '+45 87654321',
     avatar: null,
   },
   { 
     id: 'contact_3', 
-    name: 'Partner Michael', 
+    username: 'michael_p',
     relationship: 'Partner', 
     phone: '+45 55566677',
     avatar: null,
@@ -146,17 +141,113 @@ export const mockTrustedContacts = [
 export const mockConnectedGuardians = [
   { 
     id: 'connected_1', 
-    name: 'Emma S.', 
+    username: 'emma_s',
     helpedOn: '2024-01-15', 
     rating: 'up',
     avatar: null,
   },
   { 
     id: 'connected_2', 
-    name: 'Lars K.', 
+    username: 'lars_k',
     helpedOn: '2024-01-10', 
     rating: 'up',
     avatar: null,
+  },
+];
+
+// SafeCircle Users - people you've interacted with (helped or been helped by)
+export const mockSafeCircleUsers = [
+  {
+    id: 'sc_user_1',
+    username: 'emma_sor',
+    avatar: null,
+    lastActivity: {
+      type: 'helped_you', // This person helped you
+      date: '2024-11-28',
+    },
+    stats: {
+      timesHelpedYou: 3,
+      timesYouHelped: 1,
+    },
+    thankYouNote: null, // No note (they helped you, not the other way)
+  },
+  {
+    id: 'sc_user_2',
+    username: 'laura_k',
+    avatar: null,
+    lastActivity: {
+      type: 'you_helped', // You helped this person
+      date: '2024-11-25',
+    },
+    stats: {
+      timesHelpedYou: 0,
+      timesYouHelped: 2,
+    },
+    thankYouNote: {
+      received: true,
+      read: false,
+      message: "Just wanted to say thank you again for helping me yesterday. It honestly meant a lot. You being here on this platform, even if you might not need help yourself, really makes a difference. Not just for me, but for other women here too.\n\nThank you, truly.",
+    },
+  },
+  {
+    id: 'sc_user_3',
+    username: 'sofia_mad',
+    avatar: null,
+    lastActivity: {
+      type: 'helped_you',
+      date: '2024-11-20',
+    },
+    stats: {
+      timesHelpedYou: 2,
+      timesYouHelped: 0,
+    },
+    thankYouNote: null,
+  },
+  {
+    id: 'sc_user_4',
+    username: 'anna_jen',
+    avatar: null,
+    lastActivity: {
+      type: 'you_helped',
+      date: '2024-11-15',
+    },
+    stats: {
+      timesHelpedYou: 1,
+      timesYouHelped: 4,
+    },
+    thankYouNote: {
+      received: true,
+      read: true, // Already read
+      message: "I just wanted to reach out and say a huge thank you for walking with me the other night. I was feeling really scared and you made me feel so much safer.\n\nI'm so grateful this app exists and that people like you are on it. 💜",
+    },
+  },
+  {
+    id: 'sc_user_5',
+    username: 'mia_nie',
+    avatar: null,
+    lastActivity: {
+      type: 'helped_you',
+      date: '2024-11-10',
+    },
+    stats: {
+      timesHelpedYou: 1,
+      timesYouHelped: 1,
+    },
+    thankYouNote: null,
+  },
+  {
+    id: 'sc_user_6',
+    username: 'caroline_h',
+    avatar: null,
+    lastActivity: {
+      type: 'you_helped',
+      date: '2024-11-05',
+    },
+    stats: {
+      timesHelpedYou: 0,
+      timesYouHelped: 3,
+    },
+    thankYouNote: null, // No note sent yet
   },
 ];
 
@@ -203,4 +294,3 @@ export const mockAddresses = [
 export const getRandomAddress = () => {
   return mockAddresses[Math.floor(Math.random() * mockAddresses.length)];
 };
-
